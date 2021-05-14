@@ -14,6 +14,7 @@ import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
+import permission from '@/directive/permission/index.js' // 权限判断指令
 
 /**
  * If you don't want to use mock-server

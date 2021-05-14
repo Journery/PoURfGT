@@ -28,7 +28,7 @@
           <span>{{ scope.row.display_time }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作" width="110" fixed="right">
+      <el-table-column v-if="checkPermission(['teacher'])" align="center" label="操作" width="110" fixed="right">
         <template slot-scope="scope">
           <el-button
           @click.native.prevent="deleteRow(scope.$index, list)"
@@ -48,9 +48,12 @@
   import {
     getList
   } from '@/api/table'
+  import permission from '@/directive/permission/index.js' // 权限判断指令
+  import checkPermission from '@/utils/permission'
   export default {
     name: 'GroupTable',
     props: ['tableH'],
+    directives:{ permission },
     data() {
       return {
         list: null,
@@ -71,6 +74,7 @@
       this.fetchData()
     },
     methods: {
+      checkPermission,
       fetchData() {
         this.listLoading = true
         getList().then(response => {

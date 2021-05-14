@@ -17,7 +17,7 @@ import Layout from '@/layout'
  * redirect: noRedirect           if set noRedirect will no redirect in the breadcrumb
  * name:'router-name'             the name is used by <keep-alive> (must set!!!)
  * meta : {
-    roles: ['admin','editor']    control the page roles (you can set multiple roles)
+    roles: ['teacher','student']    control the page roles (you can set multiple roles)
     title: 'title'               the name show in sidebar and breadcrumb (recommend set)
     icon: 'svg-name'/'el-icon-x' the icon show in the sidebar
     breadcrumb: false            if set false, the item will hidden in breadcrumb(default is true)
@@ -56,33 +56,6 @@ export const constantRoutes = [{
         affix: true
       }
     }]
-  },
-  {
-    path: '/group',
-    component: Layout,
-    name:"Group",
-    meta: {
-      title: '分组',
-      icon: 'peoples',
-    },
-    children: [
-    {
-      path: 'addGroup',
-      name: 'AddGroup',
-      component: () => import('@/views/group/index'),
-      meta: {
-        title: '分组管理'
-      }
-    },
-    {
-      path: 'showGroup',
-      name: 'showGroup',
-      component: () => import('@/views/group/GroupTable'),
-      meta: {
-        title: '分组详情'
-      }
-    }
-    ]
   },
   {
     path: '/example',
@@ -135,11 +108,41 @@ export const constantRoutes = [{
  * asyncRoutes
  * the routes that need to be dynamically loaded based on user roles
  */
-export const asyncRoutes = [{
+export const asyncRoutes = [
+  {
+    path: '/group',
+    component: Layout,
+    name:"Group",
+    meta: {
+      title: '分组',
+      icon: 'peoples',
+    },
+    children: [
+    {
+      path: 'addGroup',
+      name: 'AddGroup',
+      component: () => import('@/views/group/index'),
+      meta: {
+        title: '分组管理',
+        roles: ['teacher'],
+      }
+    },
+    {
+      path: 'showGroup',
+      name: 'showGroup',
+      component: () => import('@/views/group/GroupTable'),
+      meta: {
+        title: '分组详情'
+      }
+    }
+    ]
+  },
+  {
     path: '/nested',
     component: Layout,
     redirect: '/nested/menu1',
     name: 'Nested',
+    roles: ['teacher'],
     meta: {
       title: 'Nested',
       icon: 'nested'
