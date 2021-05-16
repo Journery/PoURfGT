@@ -174,6 +174,7 @@ export const asyncRoutes = [
     ]
   },
   {
+
     path: '/nested',
     component: Layout,
     redirect: '/nested/menu1',
