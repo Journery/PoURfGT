@@ -105,6 +105,7 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.$message('submit!');
+          this.$refs[formName].resetFields();
         } else {
           console.log("error submit!!");
           return false;
