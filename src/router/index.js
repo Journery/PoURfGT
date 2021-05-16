@@ -128,6 +128,15 @@ export const asyncRoutes = [
       }
     },
     {
+      path: 'selectGroup',
+      name: 'SelectGroup',
+      component: () => import('@/views/group/SelectGroup'),
+      meta: {
+        title: '选择分组',
+        roles: ['student'],
+      }
+    },
+    {
       path: 'showGroup',
       name: 'showGroup',
       component: () => import('@/views/group/GroupTable'),
@@ -142,10 +151,11 @@ export const asyncRoutes = [
     component: Layout,
     redirect: '/nested/menu1',
     name: 'Nested',
-    roles: ['teacher'],
+    
     meta: {
       title: 'Nested',
-      icon: 'nested'
+      icon: 'nested',
+      roles: ['student'],
     },
     children: [{
         path: 'menu1',

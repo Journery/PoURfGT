@@ -57,19 +57,6 @@ export default {
       }
     }
   },
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'gray',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    }
-  },
-  created() {
-    this.fetchData()
-  },
   methods: {
     onSubmit() {
       this.$message('submit!')
@@ -82,13 +69,6 @@ export default {
         type: 'warning'
       })
     },
-    fetchData() {
-      this.listLoading = true
-      getList().then(response => {
-        this.list = response.data.items
-        this.listLoading = false
-      })
-    }
   }
 }
 </script>

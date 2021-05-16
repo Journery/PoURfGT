@@ -3,10 +3,12 @@ const { param2Obj } = require('./utils')
 
 const user = require('./user')
 const table = require('./table')
+const group =require('./group')
 
 const mocks = [
   ...user,
-  ...table
+  ...table,
+  ...group,
 ]
 
 // for front mock
@@ -54,4 +56,3 @@ module.exports = {
   mocks,
   mockXHR
 }
-
