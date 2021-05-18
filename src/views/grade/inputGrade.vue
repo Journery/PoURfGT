@@ -121,7 +121,7 @@ export default {
         limit: 12,
       },
       form: {
-        courseName: "",
+        courseId: "",
       },
       editVisible: false,
       editform: {

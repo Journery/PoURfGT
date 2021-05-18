@@ -1,6 +1,5 @@
 <template>
   <div class="app-container">
-
     <el-form ref="form" :model="form" label-width="120px" class="demo-dynamic">
       <el-row>
         <el-col :span="5">
@@ -212,7 +211,7 @@ export default {
         limit: 12,
       },
       form: {
-        courseName: "",
+        courseId: "",
       },
       editVisible: false,
       editform: {
@@ -292,9 +291,16 @@ export default {
   },
   methods: {
     onSubmit(formName) {
-      this.submitForm(formName);
-      this.$data.showForm = true;
-      console.log(this.$data.formName);
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.$message("submit!");
+          this.$data.isShow = true;
+          console.log(this.$data.formName);
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
     },
 
     cancelEdit(row) {
