@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: 'Vue Admin Template',
+  title: '高校老年教师工作平台',
 
   /**
    * @type {boolean} true | false
