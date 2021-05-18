@@ -194,7 +194,7 @@ export default {
     onSubmit(formName) {
       this.submitForm(formName);
       this.$data.showForm = true;
-      console.log(this.$data.gradeItems);
+      
     },
 
     submitForm(formName) {

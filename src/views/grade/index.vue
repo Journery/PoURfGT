@@ -1,16 +1,28 @@
 <template>
   <div class="app-container">
-    <el-form ref="form" :model="form" label-width="120px">
-      <el-form-item label="课程名称">
-        <el-select v-model="form.courseName" placeholder="请选择课程">
-          <el-option label="软件项目管理" value="SPM" />
-          <el-option label="企业级应用技术开发" value="javaEE" />
-          <el-option label="人工智能导论" value="ai" />
-          <el-option label="数据挖掘" value="dataMining" />
-          <el-option label="矩阵论" value="matrixTheory" />
-        </el-select>
-        <el-button type="primary" @click="onSubmit">确定</el-button>
-      </el-form-item>
+
+    <el-form ref="form" :model="form" label-width="120px" class="demo-dynamic">
+      <el-row>
+        <el-col :span="5">
+          <el-form-item
+            prop="courseId"
+            label="课程号"
+            :rules="{
+              required: true,
+              message: '请输入课程号',
+              trigger: 'blur',
+            }"
+          >
+            <el-input
+              v-model="form.courseId"
+              oninput="value=value.replace(/[^\d]/g,'')"
+            ></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="10">
+          <el-button type="primary" @click="onSubmit('form')">确定</el-button>
+        </el-col>
+      </el-row>
     </el-form>
 
     <!-- <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%">
@@ -279,10 +291,10 @@ export default {
     //this.getList()
   },
   methods: {
-    onSubmit() {
-      this.$message("submit!");
-      console.log("form:", this.$data.form);
-      this.$data.isShow = true;
+    onSubmit(formName) {
+      this.submitForm(formName);
+      this.$data.showForm = true;
+      console.log(this.$data.formName);
     },
 
     cancelEdit(row) {
