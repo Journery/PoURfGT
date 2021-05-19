@@ -102,6 +102,42 @@ export const asyncRoutes = [
     }
     ]
   },
+  {
+    path: '/grade',
+    component: Layout,
+    name:"Grade",
+    meta: {
+      title: '成绩',
+      icon: 'skill',
+      roles: ['teacher'],
+    },
+    children: [
+    {
+      path: 'setGradeItems',
+      name: 'setGradeItems',
+      component: () => import('@/views/grade/setGradeItems'),
+      meta: {
+          title: '设置课程成绩项'
+      }
+    },
+    {
+      path: 'viewGrade',
+      name: 'viewGrade',
+      component: () => import('@/views/grade/index'),
+      meta: {
+        title: '查看成绩',
+      }
+    },
+    {
+      path: 'enterGrade',
+      name: 'enterGrade',
+      component: () => import('@/views/grade/inputGrade'),
+      meta: {
+        title: '录入成绩'
+      }
+    }
+    ]
+  },
 
   // 404 page must be placed at the end !!!
   {

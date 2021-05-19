@@ -1,16 +1,101 @@
 <template>
   <div class="app-container">
-    <el-form ref="form" :model="form" label-width="120px">
-      <el-form-item label="课程名称">
-        <el-select v-model="form.courseName" placeholder="请选择课程">
-          <el-option v-for="course, key in course_list" :key="course" :label="course" :value="course"></el-option>
-        </el-select>
-      </el-form-item>
-    <el-form-item>
-      <el-button type="primary" @click="onSubmit">确定</el-button>
-    </el-form-item>
+    <el-form ref="form" :model="form" label-width="120px" class="demo-dynamic">
+      <el-row>
+        <el-col :span="5">
+          <el-form-item
+            prop="courseId"
+            label="课程号"
+            :rules="{
+              required: true,
+              message: '请输入课程号',
+              trigger: 'blur',
+            }"
+          >
+            <el-input
+              v-model="form.courseId"
+              oninput="value=value.replace(/[^\d]/g,'')"
+            ></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="10">
+          <el-button type="primary" @click="onSubmit('form')">确定</el-button>
+        </el-col>
+      </el-row>
     </el-form>
-    
+
+    <!-- <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%">
+      <el-table-column align="center" label="学号" width="80">
+        <template slot-scope="{row}">
+          <span>{{ row.num }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column width="180px" align="center" label="学生姓名">
+        <template slot-scope="{row}">
+          <span>{{ row.name }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column width="120px" align="center" label="课程号">
+        <template slot-scope="{row}">
+          <span>{{ row.coursenum }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column width="100px" align="center" label="平时成绩">
+        <template slot-scope="{row}">
+          <span>{{ row.normalgrade }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column   label="考试成绩" width="110">
+        <template slot-scope="{row}">
+           <span>{{ row.testgrade }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="总成绩" width="300px">
+        <template slot-scope="{row}">
+          <template v-if="row.edit">
+            <el-input v-model="row.title" class="edit-input" size="small" />
+            <el-button
+              class="cancel-btn"
+              size="small"
+              icon="el-icon-refresh"
+              type="warning"
+              @click="cancelEdit(row)"
+            >
+              取消
+            </el-button>
+          </template>
+          <span v-else>{{ row.title }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center"  label="操作" width="120">
+        <template slot-scope="{row}">
+          <el-button
+            v-if="row.edit"
+            type="success"
+            size="small"
+            icon="el-icon-circle-check-outline"
+            @click="confirmEdit(row)"
+          >
+            完成
+          </el-button>
+          <el-button
+            v-else
+            type="primary"
+            size="small"
+            icon="el-icon-edit"
+            @click="row.edit=!row.edit"
+          >
+            编辑
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>-->
     <div v-show="isShow">
       <!--表格渲染-->
       <el-table
@@ -49,7 +134,7 @@
           label="总成绩"
           align="center"
         ></el-table-column>
-        <el-table-column label="操作" width="200" align="center" v-if="checkPermission(['teacher'])">
+        <el-table-column label="操作" width="200" align="center">
           <template slot-scope="scope">
             <el-button
               type="primary"
@@ -103,9 +188,19 @@
 
 <script>
 /*import { fetchList } from '@/api/table'*/
-import checkPermission from '@/utils/permission'
+
 export default {
   name: "ViewGrade",
+  filters: {
+    statusFilter(status) {
+      const statusMap = {
+        published: "success",
+        draft: "info",
+        deleted: "danger",
+      };
+      return statusMap[status];
+    },
+  },
   data() {
     return {
       //list: null,
@@ -119,14 +214,6 @@ export default {
         courseId: "",
       },
       editVisible: false,
-      course_list: {
-        "SPM": "软件项目管理",
-        "javaEE": "企业级应用技术开发",
-        "AI": "人工智能导论",
-        "database": "高级数据库",
-        "dataAnalysis": "数据分析基础",
-        "SA": "软件体系结构",
-      },
       editform: {
         //用于编辑
         // normalGrade: "", // 平时成绩
@@ -203,21 +290,19 @@ export default {
     //this.getList()
   },
   methods: {
-    checkPermission,
     onSubmit(formName) {
-      this.$message("submit!");
-      this.$data.isShow = true;
-      // this.$refs[formName].validate((valid) => {
-      //   if (valid) {
-      //     this.$message("submit!");
-      //     this.$data.isShow = true;
-      //     console.log(this.$data.formName);
-      //   } else {
-      //     console.log("error submit!!");
-      //     return false;
-      //   }
-      // });
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.$message("submit!");
+          this.$data.isShow = true;
+          console.log(this.$data.formName);
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
     },
+
     cancelEdit(row) {
       row.title = row.originalTitle;
       row.edit = false;
@@ -234,6 +319,7 @@ export default {
         type: "success",
       });
     },
+
     /*编辑功能*/
     handleEdit(row) {
       this.editform = row;

@@ -1,4 +1,5 @@
-	<template>
+
+<template>
   <div class="app-container">
     <el-form
       :model="dynamicValidateForm"
