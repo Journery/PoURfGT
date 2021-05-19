@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
-export function getResult(data) {
+export function getStudentList(data) {
   return request({
-    url: '/api/stu_query_questionByStuID.do',
+    url: '/api/query_student_list.do',
     method: 'post',
     data
   })

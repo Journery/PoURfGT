@@ -27,8 +27,6 @@
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
-
-      <!-- <el-form-item prop="save_pw"> -->
       <div class="save-password-container">
         <el-checkbox label="记住密码" name="save_password" v-model="save_password" />
         <a text-align="right">忘记密码?</a>
@@ -68,25 +66,20 @@
           </el-button>
         </el-col>
       </el-row>
-      <div class="tips" ref="tip">
+      <!--      <div class="tips" ref="tip">
         <span style="margin-right:20px;">username: teacher或student</span>
         <span> password: any</span>
-      </div>
-      <el-dialog
-      v-el-drag-dialog
-      ref="FaceDialog"
-      :visible.sync="dialogVisible"
-      title="刷脸登录"
-      @opened="handleOpened()"
-      @close="handleClose()" >
-      <div class="video-container">
-         <video id="videoCamera" :width="videoWidth" :height="videoHeight" autoplay></video>
-        <canvas style="display:none;" id="canvasCamera" :width="videoWidth" :height="videoHeight"></canvas>
-      </div>
-        <div v-if="imgSrc" class="img_bg_camera">
-          <img :src="imgSrc" alt="" class="tx_img">
+      </div> -->
+      <el-dialog v-el-drag-dialog ref="FaceDialog" :visible.sync="dialogVisible" title="刷脸登录" @opened="handleOpened()"
+        @close="handleClose()">
+        <div class="video-container">
+          <video id="videoCamera" :width="videoWidth" :height="videoHeight" autoplay></video>
+          <canvas style="display:none;" id="canvasCamera" :width="videoWidth" :height="videoHeight"></canvas>
         </div>
-        <el-button @click="setImage()">拍照</el-button>
+        <!--        <div v-if="imgSrc" class="img_bg_camera">
+          <img :src="imgSrc" alt="" class="tx_img">
+        </div> -->
+        <!-- <el-button @click="setImage()">拍照</el-button> -->
       </el-dialog>
     </el-form>
   </div>
@@ -97,7 +90,9 @@
     validUsername
   } from '@/utils/validate'
   import elDragDialog from '@/directive/el-drag-dialog'
-  import { getResult } from '@/api/api_test'
+  import {
+    getStudentList
+  } from '@/api/StudentList'
   import axios from 'axios'
   export default {
     name: 'Login',
@@ -162,13 +157,18 @@
         // axios.get("/api/login.do?username=100001&password=123456&user_type=2").then(function(resp){
         //   console.log(resp);
         // })
-        axios.post("/api/stu_query_questionByStuID.do", {info_stuId: "18721841"}).then(function(res){
-          console.log(res);
-        })
-        // var data = {info_stuId: "18721841"};
-        // getResult(data).then(response => {
-        //   console.log(response.data);
+        var data = {
+          "info_courseId": "软件体系结构"
+        };
+        // axios.post("/api/query_student_list.do", data).then(function(res){
+        //   console.log(res);
         // })
+
+
+        getStudentList(data).then(response => {
+          this.$message("get");
+          console.log(response);
+        })
       },
       showPwd() {
         if (this.passwordType === 'password') {
@@ -181,22 +181,31 @@
         })
       },
       handleLogin() {
-        this.$refs.loginForm.validate(valid => {
-          if (valid) {
-            this.loading = true
-            this.$store.dispatch('user/login', this.loginForm).then(() => {
-              this.$router.push({
-                path: this.redirect || '/'
-              })
-              this.loading = false
-            }).catch(() => {
-              this.loading = false
-            })
-          } else {
-            console.log('error submit!!')
-            return false
-          }
+        this.loading = true
+        this.$store.dispatch('user/login', this.loginForm).then(() => {
+          this.$router.push({
+            path: this.redirect || '/'
+          })
+          this.loading = false
+        }).catch(() => {
+          this.loading = false
         })
+        // this.$refs.loginForm.validate(valid => {
+        //   if (valid) {
+        //     this.loading = true
+        //     this.$store.dispatch('user/login', this.loginForm).then(() => {
+        //       this.$router.push({
+        //         path: this.redirect || '/'
+        //       })
+        //       this.loading = false
+        //     }).catch(() => {
+        //       this.loading = false
+        //     })
+        //   } else {
+        //     console.log('error submit!!')
+        //     return false
+        //   }
+        // })
       },
       getCompetence() {
         var _this = this
@@ -257,7 +266,31 @@
         // 获取图片base64链接
         var image = this.thisCancas.toDataURL('image/png')
         _this.imgSrc = image
-        this.$emit('refreshDataList', this.imgSrc)
+        let blob = this.dataURLtoBlob(image);
+        var fd = new FormData();
+        fd.append("file", blob);
+        axios({
+          method: 'POST',
+          url: "/api/face.do",
+          data: fd,
+          headers: {
+            // 'cache': false,
+            'Content-Type': false,
+            'processData': false,
+            // 'Access-Control-Allow-Origin': '*',
+          },
+        }).then(resp => {
+          console.log(resp.data.msg)
+          if(resp.data.msg === "success"){
+            this.handleLogin()
+            this.handleClose()
+          }else{
+            this.$message("验证失败，请重试")
+          }
+        }).catch(error => {
+            console.log(error)
+          })
+        // this.$emit('refreshDataList', this.imgSrc)
       },
 
       // base64转文件
@@ -275,6 +308,20 @@
         })
       },
 
+      dataURLtoBlob(dataurl) {
+        var arr = dataurl.split(','),
+          mime = arr[0].match(/:(.*?);/)[1],
+          bstr = atob(arr[1]),
+          n = bstr.length,
+          u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new Blob([u8arr], {
+          type: mime
+        });
+      },
+
       // 关闭摄像头
       stopNavigator() {
         this.thisVideo.srcObject.getTracks()[0].stop()
@@ -283,17 +330,31 @@
       handleOpened(done) {
         this.getCompetence();
         this.$message("正在获取人脸中，请保持不动");
-        var now_this = this;
-        setTimeout(function(){
+        let now_this = this;
+        setTimeout(function() {
           now_this.setImage();
-          now_this.$message("核验中");
-        }
-        ,5000);
+        }, 2000)
+
+        // setTimeout(function() {
+        //   // now_this.setImage();
+        //   now_this.$message("核验失败，请重试");
+        // }, 5000);
+
+        // setTimeout(function() {
+        //   // now_this.setImage();
+        //   now_this.$message("成功,正在跳转");
+
+        // }, 10000);
+
+        // setTimeout(function() {
+        //   now_this.handleClose()
+        //   now_this.handleLogin();
+        // }, 12000)
       },
 
       handleClose(done) {
         this.stopNavigator();
-        this.imgSrc  = '';
+        this.imgSrc = '';
       }
     },
   }
@@ -483,13 +544,14 @@
 
     .video-container {
       text-align: center;
+
       .video {
-      width: 50%;
-      height: 50%;
-      margin: 50px auto;
-      background-color: aquamarine;
-      display: block;
-    }
+        width: 50%;
+        height: 50%;
+        margin: 50px auto;
+        background-color: aquamarine;
+        display: block;
+      }
     }
 
     .show-pwd {
