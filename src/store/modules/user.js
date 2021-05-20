@@ -1,11 +1,11 @@
 import { login, logout, getInfo } from '@/api/user'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { getToken, setToken, removeToken, getUsername, setUsername, removeUsername } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
 const getDefaultState = () => {
   return {
     token: getToken(),
-    name: '',
+    name: getUsername(),
     avatar: '',
     roles: []
   }
@@ -37,9 +37,14 @@ const actions = {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+        const { msg, token } = response
+        // console.log(response)
+        console.log(msg)
+        console.log(token)
+        commit('SET_TOKEN', token)
+        commit('SET_NAME', username)
+        setToken(token)
+        setUsername(username)
         resolve()
       }).catch(error => {
         reject(error)
@@ -50,24 +55,18 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
-        const { data } = response
-
-        if (!data) {
+      getInfo(state.name).then(response => {
+        const { msg, name, roles } = response
+        if (msg === 'fail') {
           return reject('Verification failed, please Login again.')
         }
-
-        const { roles, name, avatar } = data
-
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
-          reject('getInfo: roles must be a non-null array!')
+          reject('roles must be a non-null array!')
         }
-
         commit('SET_ROLES', roles)
         commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        resolve(data)
+        resolve({ 'roles': [roles] })
       }).catch(error => {
         reject(error)
       })
@@ -79,6 +78,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       logout(state.token).then(() => {
         removeToken() // must remove  token  first
+        removeUsername()
         resetRouter()
         commit('RESET_STATE')
         resolve()
