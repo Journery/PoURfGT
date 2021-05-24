@@ -197,31 +197,22 @@ export default {
       })
     },
     handleLogin() {
-      this.loading = true
-      this.$store.dispatch('user/login', this.loginForm).then(() => {
-        this.$router.push({
-          path: this.redirect || '/'
-        })
-        this.loading = false
-      }).catch(() => {
-        this.loading = false
+      this.$refs.loginForm.validate(valid => {
+        if (valid) {
+          this.loading = true
+          this.$store.dispatch('user/login', this.loginForm).then(() => {
+            this.$router.push({
+              path: this.redirect || '/'
+            })
+            this.loading = false
+          }).catch(() => {
+            this.loading = false
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
       })
-      // this.$refs.loginForm.validate(valid => {
-      //   if (valid) {
-      //     this.loading = true
-      //     this.$store.dispatch('user/login', this.loginForm).then(() => {
-      //       this.$router.push({
-      //         path: this.redirect || '/'
-      //       })
-      //       this.loading = false
-      //     }).catch(() => {
-      //       this.loading = false
-      //     })
-      //   } else {
-      //     console.log('error submit!!')
-      //     return false
-      //   }
-      // })
     },
     getCompetence() {
       var _this = this
@@ -298,7 +289,11 @@ export default {
       }).then(resp => {
         console.log(resp.data.msg)
         if (resp.data.msg === 'success') {
-          this.handleLogin()
+          this.$store.dispatch('user/login', resp.data).then(() => {
+            this.$router.push({
+              path: this.redirect || '/'
+            })
+          })
           this.handleClose()
         } else {
           this.$message('验证失败，请重试')
