@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, getInfo, face } from '@/api/user'
 import { getToken, setToken, removeToken, getUsername, setUsername, removeUsername } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -51,6 +51,23 @@ const actions = {
       })
     })
   },
+  face({commit}, data){
+    return new Promise((resolve, reject) => {
+      face(data).then(response => {
+        const { msg, token } = response
+        // console.log(response)
+        console.log(msg)
+        console.log(token)
+        commit('SET_TOKEN', token)
+        commit('SET_NAME', "20720000")
+        setToken(token)
+        setUsername("20720000")
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
 
   // get user info
   getInfo({ commit, state }) {
@@ -64,7 +81,7 @@ const actions = {
         if (!roles || roles.length <= 0) {
           reject('roles must be a non-null array!')
         }
-        commit('SET_ROLES', roles)
+        commit('SET_ROLES', [roles])
         commit('SET_NAME', name)
         resolve({ 'roles': [roles] })
       }).catch(error => {

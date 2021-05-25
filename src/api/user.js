@@ -9,6 +9,20 @@ export function login(data) {
   })
 }
 
+export function face(data) {
+  return request({
+    url: '/api/face.do',
+    method: 'post',
+    headers: {
+      // 'cache': false,
+      'Content-Type': false,
+      'processData': false
+      // 'Access-Control-Allow-Origin': '*',
+    },
+    data:data
+  })
+}
+
 export function getInfo(username) {
   return request({
     url: '/api/getUserInfo.do',

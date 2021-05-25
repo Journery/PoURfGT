@@ -285,26 +285,12 @@ export default {
       const blob = this.dataURLtoBlob(image)
       var fd = new FormData()
       fd.append('file', blob)
-      axios({
-        method: 'POST',
-        url: '/api/face.do',
-        data: fd,
-        headers: {
-          // 'cache': false,
-          'Content-Type': false,
-          'processData': false
-          // 'Access-Control-Allow-Origin': '*',
-        }
-      }).then(resp => {
-        console.log(resp.data.msg)
-        if (resp.data.msg === 'success') {
-          this.handleLogin()
-          this.handleClose()
-        } else {
-          this.$message('验证失败，请重试')
-        }
-      }).catch(error => {
-        console.log(error)
+      this.$store.dispatch('user/face', resp).then(() => {
+        this.$router.push({
+          path: this.redirect || '/'
+        })
+      }).catch(() => {
+        this.$message('验证失败，请重试')
       })
       // this.$emit('refreshDataList', this.imgSrc)
     },
